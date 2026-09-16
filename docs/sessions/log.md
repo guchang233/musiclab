@@ -2,6 +2,12 @@
 
 最新在最上（倒序）。每条对应 `docs/sessions/<YYYYMMDD-HHMM>.md`。
 
+## 2026-09-16 19:1X - Release 补 Windows exe，全链路跑通（v0.1.1）
+
+- 详见 [20260916-1910.md](./20260916-1910.md)
+- 关键成果：build-windows job（PyInstaller exe 103.7MB）；修复 Windows 编码崩溃、Tauri frontendDist、缺图标三连；Release v0.1.1 全 job success（exe/deb/whl/tar.gz）。
+- 注意：tag 与包内版本号需手动同步（pyproject / tauri.conf）。
+
 ## 2026-09-16 18:5X - 修复 CI 失败：tests 包导入问题
 
 - 详见 [20260916-1855.md](./20260916-1855.md)
