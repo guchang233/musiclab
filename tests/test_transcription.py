@@ -8,7 +8,7 @@ import pytest
 from musiclab.engine.transcription.drum_onset import DrumOnsetTranscriber
 from musiclab.engine.transcription.pyin_backend import PyinTranscriber
 
-from conftest import audio
+from tests.conftest import audio
 
 
 class TestPyinTranscriber:

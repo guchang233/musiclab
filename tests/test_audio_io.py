@@ -9,7 +9,7 @@ from musiclab.audio import load_audio, resample_audio, write_stems, write_wav
 from musiclab.engine.errors import AudioLoadError
 from musiclab.types import AudioData, Stem
 
-from conftest import audio, sine
+from tests.conftest import audio, sine
 
 
 class TestLoadAudio:

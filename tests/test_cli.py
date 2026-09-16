@@ -6,7 +6,7 @@ import pytest
 
 from musiclab.cli import main
 
-from conftest import audio, melody
+from tests.conftest import audio, melody
 
 
 @pytest.fixture()

@@ -10,7 +10,7 @@ from musiclab.engine.errors import UnsupportedStemSchemaError
 from musiclab.engine.separation.spectral import SpectralSeparator
 from musiclab.types import STEM_FOUR, STEM_SIX
 
-from conftest import audio, kick, mix_at, sine
+from tests.conftest import audio, kick, mix_at, sine
 
 
 @pytest.fixture(scope="session")

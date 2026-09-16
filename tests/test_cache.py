@@ -8,7 +8,7 @@ import pytest
 from musiclab.engine.errors import CacheError
 from musiclab.pipeline.cache import ArtifactCache, audio_digest
 
-from conftest import audio, sine
+from tests.conftest import audio, sine
 
 
 @pytest.fixture()
