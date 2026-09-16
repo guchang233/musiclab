@@ -49,3 +49,7 @@ class PipelineError(MusicLabError):
 
 class CacheError(MusicLabError):
     """缓存读写失败。"""
+
+
+class OperationCancelledError(MusicLabError):
+    """操作在执行中被协作式取消。"""

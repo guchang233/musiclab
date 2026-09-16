@@ -5,6 +5,7 @@
 - ``separate``  多轨分离
 - ``transcribe`` 单文件转谱
 - ``pipeline``  端到端：分离 + 逐轨转谱
+- ``serve``     启动核心服务进程（HTTP API，供 UI 壳调用）
 
 退出码：0 成功；2 参数/输入错误；3 后端不可用；4 未知内部错误。
 """
@@ -78,6 +79,14 @@ def _build_parser() -> argparse.ArgumentParser:
     p_pl.add_argument("--tempo", type=float, default=120.0, help="MIDI tempo（默认 120）")
     p_pl.add_argument("--no-cache", action="store_true", help="禁用产物缓存")
     p_pl.add_argument("--json", action="store_true", help="以 JSON 输出执行报告")
+
+    # ---- serve ----
+    p_sv = sub.add_parser(
+        "serve", help="启动核心服务进程（HTTP JSON API + SSE 进度流，供 UI 壳调用）"
+    )
+    p_sv.add_argument("--host", default="127.0.0.1", help="监听地址（默认 127.0.0.1）")
+    p_sv.add_argument("--port", type=int, default=8765, help="监听端口（默认 8765）")
+    p_sv.add_argument("--workers", type=int, default=1, help="worker 线程数（默认 1）")
     return parser
 
 
@@ -182,6 +191,24 @@ def cmd_pipeline(args: argparse.Namespace) -> int:
     return 0
 
 
+def cmd_serve(args: argparse.Namespace) -> int:
+    from musiclab.service import serve as run_service
+
+    print(f"musiclab 服务已启动：http://{args.host}:{args.port}")
+    print("API：GET /api/health | GET /api/backends | POST /api/tasks")
+    try:
+        server, _thread = run_service(
+            host=args.host, port=args.port, workers=args.workers, background=False
+        )
+        server.serve_forever()  # 主线程接管事件循环，Ctrl-C 退出
+    except KeyboardInterrupt:
+        print("已停止", file=sys.stderr)
+    finally:
+        server.shutdown()
+        server.server_close()
+    return 0
+
+
 def main(argv: list[str] | None = None) -> int:
     parser = _build_parser()
     args = parser.parse_args(argv)
@@ -196,6 +223,7 @@ def main(argv: list[str] | None = None) -> int:
         "separate": cmd_separate,
         "transcribe": cmd_transcribe,
         "pipeline": cmd_pipeline,
+        "serve": cmd_serve,
     }
     try:
         return handlers[args.command](args)

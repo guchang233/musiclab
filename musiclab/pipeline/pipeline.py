@@ -19,11 +19,15 @@ import logging
 import time
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Any, Mapping
+from typing import Any, Callable, Mapping
 
 from musiclab.audio import load_audio, write_stems
 from musiclab.config import EngineConfig
-from musiclab.engine.errors import BackendNotAvailableError, MusicLabError
+from musiclab.engine.errors import (
+    BackendNotAvailableError,
+    MusicLabError,
+    OperationCancelledError,
+)
 from musiclab.engine.registry import ModelRegistry
 from musiclab.midi import write_midi
 from musiclab.pipeline.cache import ArtifactCache
@@ -164,6 +168,8 @@ class TranscriptionPipeline:
         stems: str = "4",
         routing: Mapping[str, str] | None = None,
         tempo_bpm: float = 120.0,
+        on_event: Callable[[Mapping[str, Any]], None] | None = None,
+        should_cancel: Callable[[], bool] | None = None,
     ) -> PipelineReport:
         """执行完整管线。
 
@@ -173,10 +179,25 @@ class TranscriptionPipeline:
             stems: 分轨预设（"2" / "4" / "6"）。
             routing: 路由覆盖（{分轨名: "skip" 或乐器标签}）。
             tempo_bpm: MIDI 渲染 tempo。
+            on_event: 阶段事件回调（进度留痕），每个阶段开始/结束时调用。
+            should_cancel: 取消探测回调，返回 True 时在阶段边界抛出
+                :class:`OperationCancelledError`。
 
         Returns:
             执行报告。
         """
+
+        def emit(phase: str, index: int, total: int, stage: str, **extra: Any) -> None:
+            if on_event is not None:
+                on_event(
+                    {"kind": "stage", "phase": phase, "stage": stage,
+                     "index": index, "total": total, **extra}
+                )
+
+        def check_cancel() -> None:
+            if should_cancel is not None and should_cancel():
+                raise OperationCancelledError("管线在阶段边界被取消")
+
         started = time.perf_counter()
         output_dir = Path(output_dir)
         output_dir.mkdir(parents=True, exist_ok=True)
@@ -188,8 +209,11 @@ class TranscriptionPipeline:
         report = PipelineReport(
             input=str(input_path), output_dir=str(output_dir), schema=schema
         )
+        total = 2 + len(schema)  # load + separate + 逐轨转录
 
         # ---- 1. 加载 ----
+        check_cancel()
+        emit("start", 1, total, "load")
         t0 = time.perf_counter()
         audio = load_audio(input_path, sample_rate=self._config.sample_rate)
         report.stages.append(
@@ -200,17 +224,36 @@ class TranscriptionPipeline:
                 outputs=[str(input_path)],
             )
         )
+        emit("end", 1, total, "load", seconds=report.stages[-1].seconds)
         logger.info(
             "已加载 %s：%.1fs / %dch / %dHz",
             input_path, audio.duration, audio.channels, audio.sample_rate,
         )
 
         # ---- 2. 分离（带缓存） ----
+        check_cancel()
+        emit("start", 2, total, "separate")
         stems_list = self._separate_stage(audio, schema, output_dir, report)
+        sep_stage = report.stages[-1]
+        emit("end", 2, total, "separate", backend=sep_stage.backend,
+             cached=sep_stage.cached)
 
         # ---- 3. 逐轨转录（乐器路由） ----
-        for stem in stems_list:
+        for i, stem in enumerate(stems_list):
+            check_cancel()
+            index = 3 + i
+            emit("start", index, total, f"transcribe:{stem.name}")
             self._transcribe_stage(stem, route, output_dir, tempo_bpm, report)
+            tr_stage = next(
+                (s for s in report.stages if s.name == f"transcribe:{stem.name}"), None
+            )
+            # 被路由跳过 / 无可用后端时没有 StageReport，只发告警性质的事件
+            if tr_stage is None:
+                emit("end", index, total, f"transcribe:{stem.name}", skipped=True)
+            else:
+                emit("end", index, total, f"transcribe:{stem.name}",
+                     backend=tr_stage.backend, cached=tr_stage.cached,
+                     notes=report.notes_count.get(stem.name, 0))
 
         report.total_seconds = time.perf_counter() - started
         logger.info(

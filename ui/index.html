@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>MusicLab</title>
+<link rel="stylesheet" href="style.css" />
+</head>
+<body>
+<header>
+  <h1>MusicLab</h1>
+  <div class="status">
+    核心服务 <span id="svc-state" class="pill pill-unknown">检测中</span>
+    <span id="svc-version" class="dim"></span>
+  </div>
+</header>
+
+<main>
+  <section class="card" id="submit-card">
+    <h2>新建任务</h2>
+    <form id="submit-form">
+      <label>任务类型
+        <select id="f-type">
+          <option value="pipeline">管线（分离 + 逐轨转谱）</option>
+          <option value="separate">仅分离</option>
+          <option value="transcribe">仅转谱（WAV→MIDI）</option>
+        </select>
+      </label>
+      <label>输入音频
+        <input id="f-input" type="text" placeholder="/path/to/song.wav" required />
+      </label>
+      <label>输出目录 / 文件
+        <input id="f-output" type="text" placeholder="/path/to/out" required />
+      </label>
+      <div class="row">
+        <label>分轨预设
+          <select id="f-stems">
+            <option value="2">2 轨</option>
+            <option value="4" selected>4 轨</option>
+            <option value="6">6 轨</option>
+          </select>
+        </label>
+        <label>MIDI tempo
+          <input id="f-tempo" type="number" value="120" min="20" max="300" />
+        </label>
+      </div>
+      <label class="check">
+        <input id="f-polyphonic" type="checkbox" /> 多声部内容（仅转谱：选择多音轨后端）
+      </label>
+      <button type="submit" id="submit-btn">提交任务</button>
+    </form>
+    <p id="submit-error" class="error" hidden></p>
+  </section>
+
+  <section class="card grow">
+    <h2>任务列表</h2>
+    <ul id="task-list" class="task-list"></ul>
+    <p id="empty-hint" class="dim">暂无任务</p>
+  </section>
+</main>
+
+<template id="task-item-tpl">
+  <li class="task">
+    <div class="task-head">
+      <span class="task-type"></span>
+      <span class="task-id dim"></span>
+      <span class="pill"></span>
+      <button class="cancel-btn" hidden>取消</button>
+    </div>
+    <div class="task-progress">
+      <div class="bar"><div class="fill"></div></div>
+      <span class="progress-text dim"></span>
+    </div>
+    <div class="task-detail"></div>
+  </li>
+</template>
+
+<script src="app.js"></script>
+</body>
+</html>
