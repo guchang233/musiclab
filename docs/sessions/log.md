@@ -2,6 +2,14 @@
 
 最新在最上（倒序）。每条对应 `docs/sessions/<YYYYMMDD-HHMM>.md`。
 
+## 2026-09-16 18:3X - CI：自动测试 / 编译 / 发布 Release
+
+- 详见 [20260916-1830.md](./20260916-1830.md)
+- 关键成果：
+  1. `ci.yml`：push/PR → 3.10-3.13 矩阵测试 + 构建检查。
+  2. `release.yml`：tag `v*` → 测试 → 编译（Python 包 + Tauri deb）→ 自动发 Release。
+- 下一步：推 `v0.1.0` tag 真实验证全链路；PyInstaller sidecar；插件系统。
+
 ## 2026-09-16 17:5X - 阶段②：核心服务进程 + Tauri 壳骨架
 
 - 详见 [20260916-1750.md](./20260916-1750.md)
