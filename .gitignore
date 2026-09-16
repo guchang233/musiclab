@@ -18,6 +18,10 @@ dist/
 *.whl
 *.tar.gz
 
+# Tauri / Rust
+ui/src-tauri/target/
+ui/src-tauri/gen/
+
 # 音频/中间产物
 *.wav
 *.mp3

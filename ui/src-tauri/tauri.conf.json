@@ -4,7 +4,7 @@
   "version": "0.1.0",
   "identifier": "com.musiclab.desktop",
   "build": {
-    "frontendDist": "../"
+    "frontendDist": "../web/"
   },
   "app": {
     "windows": [

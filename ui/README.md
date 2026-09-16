@@ -12,7 +12,7 @@ Tauri UI 进程（本目录）
 engine（分离 / 转录后端，worker 线程内执行）
 ```
 
-- **前端**：`index.html` + `app.js`，纯原生 JS 无打包器，直接消费
+- **前端**：`web/`（`index.html` + `app.js`），纯原生 JS 无打包器，直接消费
   `POST /api/tasks`、`GET /api/tasks/{id}`、SSE `GET /api/tasks/{id}/events`。
   也可以脱离 Tauri 单独用浏览器打开（只要 `musiclab serve` 在跑）。
 - **Rust 壳**：`src-tauri/`，启动时拉起 sidecar（`musiclab serve`），
@@ -24,10 +24,10 @@ engine（分离 / 转录后端，worker 线程内执行）
 # 1. 核心服务（单独调试 UI 时）
 musiclab serve --port 8765
 
-# 2. 浏览器直接打开 ui/index.html 即可（零构建）
+# 2. 浏览器直接打开 ui/web/index.html 即可（零构建）
 
 # 3. Tauri 壳（需要 Rust + 系统 webkit2gtk 依赖）
-cd ui/src-tauri && cargo run
+cd ui && cargo tauri build   # 或 cd ui/src-tauri && cargo run
 ```
 
 ## 打包说明

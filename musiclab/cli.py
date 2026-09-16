@@ -210,6 +210,11 @@ def cmd_serve(args: argparse.Namespace) -> int:
 
 
 def main(argv: list[str] | None = None) -> int:
+    # Windows 控制台默认 cp1252/gbk，打印中文与表格字符会 UnicodeEncodeError
+    for _stream in (sys.stdout, sys.stderr):
+        if hasattr(_stream, "reconfigure"):
+            _stream.reconfigure(encoding="utf-8", errors="replace")
+
     parser = _build_parser()
     args = parser.parse_args(argv)
 
