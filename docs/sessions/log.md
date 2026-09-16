@@ -2,6 +2,12 @@
 
 最新在最上（倒序）。每条对应 `docs/sessions/<YYYYMMDD-HHMM>.md`。
 
+## 2026-09-16 18:5X - 修复 CI 失败：tests 包导入问题
+
+- 详见 [20260916-1855.md](./20260916-1855.md)
+- 关键成果：`tests/__init__.py` + 统一 `tests.conftest` 导入；CI 已绿（`f213d79`）。
+- 下一步：打 `v0.1.0` tag 验证 Release 链路（含 Tauri deb）。
+
 ## 2026-09-16 18:3X - CI：自动测试 / 编译 / 发布 Release
 
 - 详见 [20260916-1830.md](./20260916-1830.md)
