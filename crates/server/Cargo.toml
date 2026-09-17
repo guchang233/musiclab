@@ -1,0 +1,16 @@
+[package]
+name = "musiclab-server"
+description = "MusicLab HTTP 服务：JSON API + 静态 UI（无头模式，与 Tauri 壳共用同一引擎）"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+
+[dependencies]
+musiclab-core = { path = "../core" }
+tiny_http = "0.12"
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+
+[[bin]]
+name = "musiclab-server"
+path = "src/main.rs"

@@ -1,0 +1,127 @@
+name: Release
+
+on:
+  push:
+    tags: ['v*']
+
+permissions:
+  contents: write
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@v2
+      - run: cargo test -p musiclab-core -p musiclab-server --locked
+
+  build-linux:
+    needs: test
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-22.04
+            targets: deb
+          - os: ubuntu-22.04
+            targets: appimage
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@v2
+      - name: 系统依赖
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libwebkit2gtk-4.1-dev libgtk-3-dev libayatana-appindicator3-dev librsvg2-dev
+      - name: 安装 tauri-cli
+        uses: taiki-e/install-action@v2
+        with:
+          tool: cargo-tauri
+      - name: 构建
+        run: cargo tauri build --bundles ${{ matrix.targets }}
+      - name: 收集产物
+        run: |
+          mkdir -p dist
+          find src-tauri/target/release/bundle -type f \( -name '*.deb' -o -name '*.AppImage' \) -exec cp {} dist/ \;
+      - uses: actions/upload-artifact@v4
+        with:
+          name: linux-${{ matrix.targets }}
+          path: dist/*
+
+  build-windows:
+    needs: test
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@v2
+      - name: 安装 tauri-cli
+        uses: taiki-e/install-action@v2
+        with:
+          tool: cargo-tauri
+      - name: 构建（NSIS + 独立 exe）
+        run: cargo tauri build --bundles nsis
+      - name: 收集产物
+        shell: bash
+        run: |
+          mkdir -p dist
+          find src-tauri/target/release/bundle -type f -name '*.exe' -exec cp {} dist/ \;
+          cp src-tauri/target/release/musiclab-app.exe dist/musiclab-app-standalone.exe || true
+      - uses: actions/upload-artifact@v4
+        with:
+          name: windows-nsis
+          path: dist/*
+
+  build-server:
+    needs: test
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-22.04
+            target: x86_64-unknown-linux-gnu
+            suffix: linux-x86_64
+          - os: windows-latest
+            target: x86_64-pc-windows-msvc
+            suffix: windows-x86_64
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: ${{ matrix.target }}
+      - uses: Swatinem/rust-cache@v2
+      - name: 构建 server
+        run: cargo build --release -p musiclab-server --target ${{ matrix.target }} --locked
+      - name: 收集产物
+        shell: bash
+        run: |
+          mkdir -p dist
+          cp target/${{ matrix.target }}/release/musiclab-server${{ contains(matrix.os,'windows') && '.exe' || '' }} dist/musiclab-server-${{ matrix.suffix }}${{ contains(matrix.os,'windows') && '.exe' || '' }}
+      - uses: actions/upload-artifact@v4
+        with:
+          name: server-${{ matrix.suffix }}
+          path: dist/*
+
+  release:
+    needs: [build-linux, build-windows, build-server]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          path: assets
+          merge-multiple: true
+      - name: 列出产物
+        run: find assets -type f | sort
+      - name: 发布 Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: assets/*
+          generate_release_notes: true
+          draft: false

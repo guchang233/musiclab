@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MusicLab</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <header>
+    <div class="brand">
+      <span class="logo">♪</span>
+      <h1>MusicLab</h1>
+      <span class="tagline" id="mode-tag">原生引擎 · 分离 + 转谱</span>
+    </div>
+  </header>
+
+  <main>
+    <!-- 提交面板 -->
+    <section class="card" id="submit-card">
+      <h2>新任务</h2>
+      <div class="form-row">
+        <label for="input-path">音频文件（WAV）</label>
+        <div class="file-row">
+          <input id="input-path" type="text" placeholder="选择或输入 .wav 文件路径" spellcheck="false" />
+          <button id="btn-browse" class="btn ghost" title="浏览文件">浏览…</button>
+        </div>
+      </div>
+      <div class="form-grid">
+        <div class="form-row">
+          <label for="stems">分轨预设</label>
+          <select id="stems">
+            <option value="3" selected>3 轨（bass / harmonic / drums）</option>
+            <option value="2">2 轨（harmonic / percussive）</option>
+          </select>
+        </div>
+        <div class="form-row">
+          <label for="tempo">速度 BPM（MIDI 时间轴）</label>
+          <input id="tempo" type="number" value="120" min="20" max="300" step="0.5" />
+        </div>
+        <div class="form-row">
+          <label for="outdir">输出目录（可选）</label>
+          <input id="outdir" type="text" placeholder="默认系统临时目录" spellcheck="false" />
+        </div>
+      </div>
+      <div class="actions">
+        <button id="btn-submit" class="btn primary">开始处理</button>
+      </div>
+      <p class="hint" id="submit-hint"></p>
+    </section>
+
+    <!-- 任务列表 -->
+    <section class="card">
+      <h2>任务</h2>
+      <div id="task-list" class="task-list">
+        <p class="empty">暂无任务</p>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <span id="conn-status">●</span>
+    <span id="conn-text">连接中…</span>
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>

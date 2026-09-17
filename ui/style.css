@@ -1,0 +1,131 @@
+:root {
+  --bg: #12141d;
+  --card: #1b1e2b;
+  --border: #2a2e40;
+  --text: #e2e4ee;
+  --muted: #8b90a5;
+  --accent: #5eead4;
+  --accent-dim: #2c5c53;
+  --warn: #ffb86c;
+  --err: #ff6b81;
+  --ok: #7ee787;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: "Segoe UI", "PingFang SC", "Microsoft YaHei", system-ui, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+header { padding: 20px 28px; }
+.brand { display: flex; align-items: baseline; gap: 12px; }
+.logo { font-size: 28px; color: var(--accent); }
+h1 { font-size: 20px; font-weight: 700; letter-spacing: 0.5px; }
+.tagline { color: var(--muted); font-size: 13px; }
+
+main { flex: 1; padding: 0 28px 24px; display: flex; flex-direction: column; gap: 20px; max-width: 860px; width: 100%; margin: 0 auto; }
+
+.card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 20px;
+}
+
+h2 { font-size: 15px; margin-bottom: 14px; color: var(--accent); }
+
+.form-row { margin-bottom: 12px; display: flex; flex-direction: column; gap: 6px; }
+.form-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 14px; }
+@media (max-width: 700px) { .form-grid { grid-template-columns: 1fr; } }
+
+label { font-size: 13px; color: var(--muted); }
+
+input[type="text"], input[type="number"], select {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: var(--text);
+  padding: 9px 12px;
+  font-size: 14px;
+  width: 100%;
+}
+input:focus, select:focus { outline: none; border-color: var(--accent-dim); }
+
+.file-row { display: flex; gap: 8px; }
+.file-row input { flex: 1; }
+
+.btn {
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--bg);
+  color: var(--text);
+  padding: 9px 18px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.btn:hover { border-color: var(--accent-dim); }
+.btn.primary { background: var(--accent); color: #0b1220; font-weight: 700; border: none; }
+.btn.primary:hover { filter: brightness(1.1); }
+.btn.primary:disabled { opacity: 0.5; cursor: not-allowed; }
+.btn.ghost { white-space: nowrap; }
+.btn.small { padding: 4px 12px; font-size: 12px; }
+.btn.danger { color: var(--err); }
+
+.actions { margin-top: 8px; display: flex; gap: 10px; }
+.hint { margin-top: 10px; font-size: 13px; color: var(--muted); min-height: 18px; }
+.hint.error { color: var(--err); }
+
+.task-list { display: flex; flex-direction: column; gap: 12px; }
+.empty { color: var(--muted); font-size: 13px; }
+
+.task {
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 14px;
+}
+.task-head { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.task-title { font-size: 14px; font-weight: 600; flex: 1; min-width: 200px; word-break: break-all; }
+.badge {
+  font-size: 11px; padding: 3px 10px; border-radius: 20px;
+  border: 1px solid var(--border); color: var(--muted);
+}
+.badge.running { color: var(--warn); border-color: var(--warn); }
+.badge.done { color: var(--ok); border-color: var(--ok); }
+.badge.error { color: var(--err); border-color: var(--err); }
+.badge.cancelled { color: var(--muted); }
+
+.progress-track {
+  height: 6px; background: var(--bg); border-radius: 4px;
+  margin: 12px 0 8px; overflow: hidden;
+}
+.progress-bar {
+  height: 100%; background: var(--accent); border-radius: 4px;
+  width: 0%; transition: width 0.3s;
+}
+.stage-line { font-size: 12px; color: var(--muted); }
+.evlog {
+  margin-top: 10px; font-size: 12px; font-family: ui-monospace, Consolas, monospace;
+  background: var(--bg); border-radius: 8px; padding: 10px;
+  max-height: 160px; overflow-y: auto; color: var(--muted);
+  white-space: pre-wrap; word-break: break-all;
+}
+.result-files { margin-top: 10px; display: flex; flex-wrap: wrap; gap: 8px; }
+.file-chip {
+  font-size: 12px; padding: 4px 10px; border-radius: 6px;
+  border: 1px solid var(--border); cursor: pointer; color: var(--accent);
+}
+.file-chip:hover { border-color: var(--accent-dim); }
+.error-msg { margin-top: 8px; color: var(--err); font-size: 13px; word-break: break-all; }
+
+footer {
+  padding: 12px 28px; font-size: 12px; color: var(--muted);
+  display: flex; align-items: center; gap: 6px;
+}
+#conn-status.running { color: var(--ok); }
+#conn-status.offline { color: var(--err); }

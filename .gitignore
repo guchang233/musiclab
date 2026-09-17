@@ -1,0 +1,18 @@
+# Rust
+target/
+Cargo.lock.orig
+
+# Tauri 生成物
+src-tauri/gen/
+
+# 构建产物
+*.wav
+*.mid
+*.midi
+out/
+artifacts/
+
+# 系统
+.DS_Store
+.idea/
+.vscode/
