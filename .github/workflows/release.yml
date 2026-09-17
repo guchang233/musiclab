@@ -38,12 +38,12 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y libwebkit2gtk-4.1-dev libgtk-3-dev libayatana-appindicator3-dev librsvg2-dev
-      - name: 安装 tauri-cli
-        uses: taiki-e/install-action@v2
+      - name: 构建（tauri-action，仅构建）
+        uses: tauri-apps/tauri-action@v0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tool: cargo-tauri
-      - name: 构建
-        run: cargo tauri build --bundles ${{ matrix.targets }}
+          args: --bundles ${{ matrix.targets }}
       - name: 收集产物
         run: |
           mkdir -p dist
@@ -60,18 +60,17 @@ jobs:
       - uses: actions/checkout@v4
       - uses: dtolnay/rust-toolchain@stable
       - uses: Swatinem/rust-cache@v2
-      - name: 安装 tauri-cli
-        uses: taiki-e/install-action@v2
+      - name: 构建（tauri-action，仅构建 NSIS）
+        uses: tauri-apps/tauri-action@v0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tool: cargo-tauri
-      - name: 构建（NSIS + 独立 exe）
-        run: cargo tauri build --bundles nsis
+          args: --bundles nsis
       - name: 收集产物
         shell: bash
         run: |
           mkdir -p dist
           find src-tauri/target/release/bundle -type f -name '*.exe' -exec cp {} dist/ \;
-          cp src-tauri/target/release/musiclab-app.exe dist/musiclab-app-standalone.exe || true
       - uses: actions/upload-artifact@v4
         with:
           name: windows-nsis
