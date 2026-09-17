@@ -47,7 +47,10 @@ jobs:
       - name: 收集产物
         run: |
           mkdir -p dist
-          find src-tauri/target/release/bundle -type f \( -name '*.deb' -o -name '*.AppImage' \) -exec cp {} dist/ \;
+          for d in target/release/bundle src-tauri/target/release/bundle; do
+            if [ -d "$d" ]; then find "$d" -type f \( -name '*.deb' -o -name '*.AppImage' \) -exec cp {} dist/ \; fi
+          done
+          ls -la dist/
       - uses: actions/upload-artifact@v4
         with:
           name: linux-${{ matrix.targets }}
@@ -70,7 +73,10 @@ jobs:
         shell: bash
         run: |
           mkdir -p dist
-          find src-tauri/target/release/bundle -type f -name '*.exe' -exec cp {} dist/ \;
+          for d in target/release/bundle src-tauri/target/release/bundle; do
+            if [ -d "$d" ]; then find "$d" -type f -name '*.exe' -exec cp {} dist/ \; fi
+          done
+          ls -la dist/
       - uses: actions/upload-artifact@v4
         with:
           name: windows-nsis
