@@ -23,7 +23,6 @@
   "bundle": {
     "active": true,
     "targets": "all",
-    "category": "Audio",
     "shortDescription": "音频分轨 + WAV→MIDI 转录",
     "icon": [
       "icons/32x32.png",
